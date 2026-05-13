@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>Real Time Communication App</title>
+
+    <style>
+
+        body {
+            font-family: Arial;
+            background: #f4f4f4;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        .box {
+            background: white;
+            padding: 20px;
+            margin-top: 20px;
+            border-radius: 10px;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            background: black;
+            color: white;
+            border: none;
+            margin-top: 10px;
+            cursor: pointer;
+        }
+
+        video {
+            width: 100%;
+            margin-top: 10px;
+            border-radius: 10px;
+            background: black;
+        }
+
+        canvas {
+            border: 2px solid black;
+            background: white;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .message {
+            background: #eee;
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 10px;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+    <h1>Real Time Communication App</h1>
+
+    <div class="box">
+
+        <h2>User Authentication</h2>
+
+        <input
+            type="text"
+            id="username"
+            placeholder="Enter Username"
+        >
+
+        <button onclick="login()">
+            Login
+        </button>
+
+    </div>
+
+    <div class="box">
+
+        <h2>Video Preview</h2>
+
+        <video id="video" autoplay></video>
+
+        <button onclick="startVideo()">
+            Start Camera
+        </button>
+
+    </div>
+
+    <div class="box">
+
+        <h2>File Sharing</h2>
+
+        <input type="file">
+
+    </div>
+
+    <div class="box">
+
+        <h2>Whiteboard</h2>
+
+        <canvas
+            id="board"
+            width="500"
+            height="300"
+        ></canvas>
+
+    </div>
+
+    <div class="box">
+
+        <h2>Chat</h2>
+
+        <textarea
+            id="message"
+            placeholder="Enter Message"
+        ></textarea>
+
+        <button onclick="sendMessage()">
+            Send Message
+        </button>
+
+    </div>
+
+    <div id="messages"></div>
+
+    <script>
+
+        let currentUser = "";
+
+        function login() {
+
+            currentUser =
+                document.getElementById("username").value;
+
+            alert("Logged in as " + currentUser);
+        }
+
+        async function startVideo() {
+
+            const video =
+                document.getElementById("video");
+
+            const stream =
+                await navigator.mediaDevices.getUserMedia({
+                    video: true
+                });
+
+            video.srcObject = stream;
+        }
+
+        async function sendMessage() {
+
+            const text =
+                document.getElementById("message").value;
+
+            if(text === "") {
+                return;
+            }
+
+            await fetch(
+                "http://localhost:3000/message",
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+
+                    body: JSON.stringify({
+                        user: currentUser,
+                        text: text
+                    })
+                }
+            );
+
+            document.getElementById("message").value = "";
+
+            loadMessages();
+        }
+
+        async function loadMessages() {
+
+            const response =
+                await fetch("http://localhost:3000/messages");
+
+            const messages =
+                await response.json();
+
+            const messagesDiv =
+                document.getElementById("messages");
+
+            messagesDiv.innerHTML = "";
+
+            messages.forEach(msg => {
+
+                messagesDiv.innerHTML += `
+
+                    <div class="message">
+
+                        <b>${msg.user}</b>
+
+                        <p>${msg.text}</p>
+
+                    </div>
+                `;
+            });
+        }
+
+        setInterval(loadMessages, 2000);
+
+        const canvas =
+            document.getElementById("board");
+
+        const ctx =
+            canvas.getContext("2d");
+
+        let drawing = false;
+
+        canvas.addEventListener("mousedown", () => {
+            drawing = true;
+        });
+
+        canvas.addEventListener("mouseup", () => {
+            drawing = false;
+        });
+
+        canvas.addEventListener("mousemove", draw);
+
+        function draw(event) {
+
+            if(!drawing) {
+                return;
+            }
+
+            ctx.fillRect(
+                event.offsetX,
+                event.offsetY,
+                3,
+                3
+            );
+        }
+
+    </script>
+
+</body>
+
+</html>

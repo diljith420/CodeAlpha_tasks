@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>Project Management Tool</title>
+
+    <style>
+
+        body {
+            font-family: Arial;
+            background: #f4f4f4;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        .box {
+            background: white;
+            padding: 20px;
+            margin-top: 20px;
+            border-radius: 10px;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            background: black;
+            color: white;
+            border: none;
+            margin-top: 10px;
+            cursor: pointer;
+        }
+
+        .project {
+            background: white;
+            padding: 20px;
+            margin-top: 20px;
+            border-radius: 10px;
+        }
+
+        .task {
+            background: #eee;
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 10px;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+    <h1>Project Management Tool</h1>
+
+    <div class="box">
+
+        <h2>Create Project</h2>
+
+        <input
+            type="text"
+            id="projectName"
+            placeholder="Enter Project Name"
+        >
+
+        <button onclick="createProject()">
+            Create Project
+        </button>
+
+    </div>
+
+    <div id="projects"></div>
+
+    <script>
+
+        let projects = [];
+
+        function createProject() {
+
+            const name =
+                document.getElementById("projectName").value;
+
+            if(name === "") {
+                alert("Enter Project Name");
+                return;
+            }
+
+            projects.push({
+                name: name,
+                tasks: []
+            });
+
+            document.getElementById("projectName").value = "";
+
+            showProjects();
+        }
+
+        function addTask(projectIndex) {
+
+            const taskName =
+                prompt("Enter Task Name");
+
+            if(taskName) {
+
+                projects[projectIndex].tasks.push({
+                    name: taskName,
+                    comments: []
+                });
+
+                showProjects();
+            }
+        }
+
+        function addComment(projectIndex, taskIndex) {
+
+            const comment =
+                prompt("Enter Comment");
+
+            if(comment) {
+
+                projects[projectIndex]
+                    .tasks[taskIndex]
+                    .comments.push(comment);
+
+                showProjects();
+            }
+        }
+
+        function showProjects() {
+
+            const projectsDiv =
+                document.getElementById("projects");
+
+            projectsDiv.innerHTML = "";
+
+            projects.forEach((project, projectIndex) => {
+
+                let tasksHTML = "";
+
+                project.tasks.forEach((task, taskIndex) => {
+
+                    tasksHTML += `
+
+                        <div class="task">
+
+                            <h4>${task.name}</h4>
+
+                            <button
+                                onclick="addComment(${projectIndex},${taskIndex})"
+                            >
+                                Add Comment
+                            </button>
+
+                            <ul>
+
+                                ${task.comments.map(comment =>
+                                    `<li>${comment}</li>`
+                                ).join("")}
+
+                            </ul>
+
+                        </div>
+                    `;
+                });
+
+                projectsDiv.innerHTML += `
+
+                    <div class="project">
+
+                        <h2>${project.name}</h2>
+
+                        <button
+                            onclick="addTask(${projectIndex})"
+                        >
+                            Add Task
+                        </button>
+
+                        ${tasksHTML}
+
+                    </div>
+                `;
+            });
+        }
+
+    </script>
+
+</body>
+
+</html>
