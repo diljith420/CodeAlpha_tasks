@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>Mini Social Media App</title>
+
+    <style>
+
+        body {
+            font-family: Arial;
+            background: #f4f4f4;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        .box {
+            background: white;
+            padding: 20px;
+            margin-top: 20px;
+            border-radius: 10px;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            background: black;
+            color: white;
+            border: none;
+            margin-top: 10px;
+            cursor: pointer;
+        }
+
+        .post {
+            background: white;
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 10px;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+    <h1>Mini Social Media App</h1>
+
+    <div class="box">
+
+        <h2>User Profile</h2>
+
+        <input type="text" id="username" placeholder="Enter Username">
+
+        <button onclick="registerUser()">
+            Register User
+        </button>
+
+    </div>
+
+    <div class="box">
+
+        <h2>Create Post</h2>
+
+        <textarea id="postContent" placeholder="Write something"></textarea>
+
+        <button onclick="addPost()">
+            Add Post
+        </button>
+
+    </div>
+
+    <div id="posts"></div>
+
+    <script>
+
+        let posts = [];
+
+        function registerUser() {
+
+            const username =
+                document.getElementById("username").value;
+
+            alert("User Registered: " + username);
+        }
+
+        function addPost() {
+
+            const content =
+                document.getElementById("postContent").value;
+
+            const post = {
+                content: content,
+                likes: 0,
+                comments: []
+            };
+
+            posts.push(post);
+
+            showPosts();
+
+            document.getElementById("postContent").value = "";
+        }
+
+        function likePost(index) {
+
+            posts[index].likes++;
+
+            showPosts();
+        }
+
+        function addComment(index) {
+
+            const comment =
+                prompt("Enter Comment");
+
+            if(comment) {
+
+                posts[index].comments.push(comment);
+
+                showPosts();
+            }
+        }
+
+        function showPosts() {
+
+            const postsDiv =
+                document.getElementById("posts");
+
+            postsDiv.innerHTML = "";
+
+            posts.forEach((post, index) => {
+
+                postsDiv.innerHTML += `
+
+                    <div class="post">
+
+                        <h3>User Post</h3>
+
+                        <p>${post.content}</p>
+
+                        <p>Likes: ${post.likes}</p>
+
+                        <button onclick="likePost(${index})">
+                            Like
+                        </button>
+
+                        <button onclick="addComment(${index})">
+                            Comment
+                        </button>
+
+                        <ul>
+
+                            ${post.comments.map(comment =>
+                                `<li>${comment}</li>`
+                            ).join("")}
+
+                        </ul>
+
+                    </div>
+                `;
+            });
+        }
+
+    </script>
+
+</body>
+
+</html>
